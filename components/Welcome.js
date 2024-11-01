@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   startButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#462db5",
     height: 50,
     width: "88%",
     justifyContent: "center",

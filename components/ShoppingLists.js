@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 50,
-    backgroundColor: "#000",
+    backgroundColor: "#462db5",
   },
   addButtonText: {
     color: "#FFF",
