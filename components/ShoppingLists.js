@@ -5,6 +5,7 @@ import {
   TouchableOpacity, Alert, Platform 
 } from 'react-native';
 import { collection, addDoc, onSnapshot, query, where } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ShoppingLists = ({ db, route }) => {
   const { userID } = route.params;
@@ -21,26 +22,34 @@ const ShoppingLists = ({ db, route }) => {
       documentsSnapshot.forEach(doc => {
         newLists.push({ id: doc.id, ...doc.data() });
       });
+      cacheShoppingLists(newLists);
       setLists(newLists);
     });
 
-    //Clean up code
+    // Clean up code
     return () => {
-        if (unsubShoppinglists) unsubShoppinglists();
-      };
-    }, [db, userID]);
+      if (unsubShoppinglists) unsubShoppinglists();
+    };
+  }, [db, userID]);
 
-    const addShoppingList = async (newList) => {
-        const newListRef = await addDoc(collection(db, "shoppinglists"), newList);
-        if (newListRef.id) {
-          setLists([newList, ...lists]);
-          Alert.alert(`The list "${listName}" has been added.`);
-        } else {
-          Alert.alert("Unable to add. Please try later");
-        }
-      }
+  const cacheShoppingLists = async (listsToCache) => {
+    try {
+      await AsyncStorage.setItem('shopping_lists', JSON.stringify(listsToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
-  
+  const addShoppingList = async (newList) => {
+    const newListRef = await addDoc(collection(db, "shoppinglists"), newList);
+    if (newListRef.id) {
+      setLists([newList, ...lists]);
+      Alert.alert(`The list "${listName}" has been added.`);
+    } else {
+      Alert.alert("Unable to add. Please try later");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -78,7 +87,7 @@ const ShoppingLists = ({ db, route }) => {
               uid: userID,
               name: listName,
               items: [item1, item2]
-            }
+            };
             addShoppingList(newList);
           }}
         >
@@ -88,7 +97,7 @@ const ShoppingLists = ({ db, route }) => {
       {Platform.OS === "ios" ? <KeyboardAvoidingView behavior="padding" /> : null}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
